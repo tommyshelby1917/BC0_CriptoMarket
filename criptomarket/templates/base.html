@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="https://kit.fontawesome.com/9d4352a4a2.js" crossorigin="anonymous"></script>
+
+</head>
+<body>
+    <h1>Criptomarket, consulta el mercat de la criptomoneda amb tota la confiança.</h1>
+    <div class="container">
+        <p class=menu>
+            <i class="fa fa-home"></i> <a href="./">Benvinguda</a> | 
+            <i class="fa fa-money"></i> <a href="./compra">Fes una compra</a> |
+            <i class="fa fa-calculator"></i> <a href="./intercanvi">Intercanvi de moneda</a> |
+            <i class="fa fa-user"></i> <a href="./registre">Registra't</a>
+        </p>
+        {% block body %}
+        {% endblock %}
+    </div>
+    <footer><p>Criptomarket &copy;2021</p></footer>
+</body>
+</html>

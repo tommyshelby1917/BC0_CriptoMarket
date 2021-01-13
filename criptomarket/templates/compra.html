@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %} Registra't a Criptomarket {% endblock %}
+{% block body %}
+{% from "_formhelpers.html" import render_field %}
+<form method=post>
+    {{ form.csrf_token }}
+    <dl>
+        {{ render_field(form.email_registre) }}
+        {{ render_field(form.password_registre) }}
+        {{ render_field(form.confirm_registre) }}
+    </dl>
+    <p><input type=submit value="Vull registrar-me">
+</form>
+{% endblock %}
