@@ -11,6 +11,41 @@ import json
 DBFILE = app.config['DBFILE']
 API_KEY = app.config['API_KEY']
 
+# Conexion con la API y las 10 monedas más valuosas
+url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
+parameters = {
+'start':'1',
+'limit':'1000',
+'convert':'EUR',
+'sort':'price',
+}
+headers = {
+'Accepts': 'application/json',
+'X-CMC_PRO_API_KEY': API_KEY,
+}
+
+session = Session()
+session.headers.update(headers)
+
+# Recolecta datos JSON y Control errores
+try:
+    response = session.get(url, params=parameters)
+    data = json.loads(response.text)
+    
+except (ConnectionError, Timeout, TooManyRedirects) as errores:
+    print(errores)
+
+# Receta creacion diccionario de las 10 monedas más valiosa
+unidad_monedas_top10 = []
+precio_monedas_top10 = []
+for i in range(10):
+    precio_monedas_top10.append(round(data['data'][i]['quote']['EUR']['price'], 2))
+    unidad_monedas_top10.append(data['data'][i]['symbol'])
+
+dict_monedas_top10 = dict(zip(unidad_monedas_top10,precio_monedas_top10))
+for i in dict_monedas_top10:
+    print(f"{i}: {dict_monedas_top10[i]}")
+
 
 # Función de la query a la BD
 def consulta(query, params=()):
@@ -27,35 +62,13 @@ def consulta(query, params=()):
 # Renderizado home
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', dict_monedas_top10=dict_monedas_top10)
 
 # Renderizado registro
-@app.route('/compra', methods=['GET', 'POST'])
+@app.route('/purchase', methods=['GET', 'POST'])
 def registre():
-
-    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
-    parameters = {
-    'start':'1',
-    'limit':'1',
-    'convert':'EUR',
     
-    }
-    headers = {
-    'Accepts': 'application/json',
-    'X-CMC_PRO_API_KEY': API_KEY,
-    }
-
-    session = Session()
-    session.headers.update(headers)
-
-    try:
-        response = session.get(url, params=parameters)
-        data = json.loads(response.text)
-        print(data)
-    except (ConnectionError, Timeout, TooManyRedirects) as errores:
-        print(errores)
-    
-
+    # Formulario compra
     form = RegisterForm(request.form)
     
     if request.method == 'POST':
@@ -70,9 +83,9 @@ def registre():
                     )
             )
 
-            return redirect(url_for('compra'))
+            return redirect(url_for('purchase'))
         else:
-            return render_template("compra.html", form=form)
+            return render_template("purchase.html", form=form)
             
-    return render_template("compra.html", form=form)
+    return render_template("purchase.html", form=form)
 

@@ -1,5 +1,22 @@
 {% extends 'base.html' %}
 {% block title %} Benvinguda {% endblock %}
 {% block body %}
-<p>Benvigut o benvinguda, què vols fer?</p>
+<p>Benvigut a Criptomarket</p>
+
+<section>
+<p>Les 10 monedes més valuoses en aquest moment són:</p>
+<table>
+    <tr>
+        <th>Moneda</th>
+        <th>Preu</th>
+    </tr>
+{% for i in dict_monedas_top10 %}
+    <tr>
+        <td>{{ i }}</td>
+        <td>{{ dict_monedas_top10[i] }}€</td>
+    </tr>
+{% endfor %}
+</table>
+</section>
+
 {% endblock %}
