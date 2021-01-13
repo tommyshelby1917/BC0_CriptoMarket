@@ -2,13 +2,20 @@
 {% block title %} Registra't a Criptomarket {% endblock %}
 {% block body %}
 {% from "_formhelpers.html" import render_field %}
+<h2>Fes una compra de criptomoneda</h1>
 <form method=post>
     {{ form.csrf_token }}
     <dl>
-        {{ render_field(form.email_registre) }}
-        {{ render_field(form.password_registre) }}
-        {{ render_field(form.confirm_registre) }}
+    <table>
+        <tr>
+            <th> {{ render_field(form.moneda_compra_from) }} </th>
+            <th> {{ render_field(form.moneda_compra_to) }} </th>
+        </tr>
+        <tr>
+            <th> {{ render_field(form.cantidad_compra) }} </th>
+            <th> <input type=submit value="Fer la compra ✔️"> </th>
+        </tr>
     </dl>
-    <p><input type=submit value="Vull registrar-me">
+    </table>
 </form>
 {% endblock %}

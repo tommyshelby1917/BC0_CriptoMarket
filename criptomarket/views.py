@@ -11,13 +11,11 @@ import json
 DBFILE = app.config['DBFILE']
 API_KEY = app.config['API_KEY']
 
-# Conexion con la API y las 10 monedas más valuosas
-url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
+# Conexion con la API y parámetros
+url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest'
 parameters = {
-'start':'1',
-'limit':'1000',
 'convert':'EUR',
-'sort':'price',
+'symbol':'ETH,LTC,BNB,EOS,XLM,TRX,BTC,XRP,BCH,USDT,BSV,ADA'
 }
 headers = {
 'Accepts': 'application/json',
@@ -35,17 +33,15 @@ try:
 except (ConnectionError, Timeout, TooManyRedirects) as errores:
     print(errores)
 
-# Receta creacion diccionario de las 10 monedas más valiosa
-unidad_monedas_top10 = []
-precio_monedas_top10 = []
-for i in range(10):
-    precio_monedas_top10.append(round(data['data'][i]['quote']['EUR']['price'], 2))
-    unidad_monedas_top10.append(data['data'][i]['symbol'])
+# Creamos diccionario con lista de monedas y su valor en euros
+lista_monedas = ['ETH','LTC','BNB','EOS','XLM','TRX','BTC','XRP','BCH','USDT','BSV','ADA']
+precio_monedas = []
 
-dict_monedas_top10 = dict(zip(unidad_monedas_top10,precio_monedas_top10))
-for i in dict_monedas_top10:
-    print(f"{i}: {dict_monedas_top10[i]}")
+for moneda in lista_monedas:
+    precio_monedas.append(round(data['data'][f"{moneda}"]['quote']['EUR']['price'], 2))
 
+dict_monedas = dict(zip(lista_monedas,precio_monedas))
+print(dict_monedas)
 
 # Función de la query a la BD
 def consulta(query, params=()):
@@ -62,26 +58,26 @@ def consulta(query, params=()):
 # Renderizado home
 @app.route('/')
 def index():
-    return render_template('index.html', dict_monedas_top10=dict_monedas_top10)
+    return render_template('index.html', dict_monedas=dict_monedas)
 
 # Renderizado registro
 @app.route('/purchase', methods=['GET', 'POST'])
-def registre():
+def purchase():
     
     # Formulario compra
-    form = RegisterForm(request.form)
+    form = CompraForm(request.form)
     
     if request.method == 'POST':
         print("El methodo ha sido post!")
         if form.validate():
             print("Se ha validado!")
-            consulta('INSERT INTO users (password, email, fecha_alta) VALUES (?, ? ,? );', 
-                    (
-                        form.password_registre.data,
-                        form.email_registre.data,
-                        date.today(),
-                    )
-            )
+            # consulta('INSERT INTO users (password, email, fecha_alta) VALUES (?, ? ,? );', 
+            #         (
+            #             form.password_registre.data,
+            #             form.email_registre.data,
+            #             date.today(),
+            #         )
+            # )
 
             return redirect(url_for('purchase'))
         else:
