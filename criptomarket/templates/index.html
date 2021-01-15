@@ -4,6 +4,34 @@
 <p>Benvigut a Criptomarket</p>
 
 <section>
+<p>Els teus moviments</p>
+<table>
+    <tr>
+        <th>Data</th>
+        <th>Hora</th>
+        <th>De</th>
+        <th>Quantitat</th>
+        <th>A</th>
+        <th>Quantitat</th>
+    </tr>
+{% if lista_movimientos |length > 0 %} 
+    {% for movimiento in lista_movimientos %}
+        <tr>
+            <td>{{ movimiento['date']}}</td>
+            <td>{{ movimiento['time'] }}</td>
+            <td>{{ movimiento['from_moneda'] }}</td>
+            <td>{{ movimiento['from_cantidad'] }}</td>
+            <td>{{ movimiento['to_moneda'] }}</td>
+            <td>{{ movimiento['to_cantidad'] }}</td>
+        </tr>
+    {% endfor %}
+{% else %}
+    <p>No hi ha hagut moviments fins ara</p>
+{% endif %}
+<table>
+</section>
+<hr>
+<section>
 <p>Informació sobre el preu en € de les nostres monedes disponibles:</p>
 <table>
     <tr>
@@ -13,7 +41,7 @@
 {% for i in dict_monedas %}
     <tr>
         <td>{{ i }}</td>
-        <td>{{ dict_monedas[i] }}€</td>
+        <td>{{ dict_monedas[i][1] }}€</td>
     </tr>
 {% endfor %}
 </table>
