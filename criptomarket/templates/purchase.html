@@ -3,9 +3,8 @@
 {% block body %}
 {% from "_formhelpers.html" import render_field %}
 <h2>Fes una compra de criptomoneda</h1>
-<form method=post>
+<form method=post >
     {{ form.csrf_token }}
-    <dl>
     <table>
         <tr>
             <th> {{ render_field(form.moneda_compra_from) }} </th>
@@ -13,9 +12,14 @@
         </tr>
         <tr>
             <th> {{ render_field(form.cantidad_compra) }} </th>
-            <th> <input type=submit value="Fer la compra ✔️"> </th>
+            <th> {{ cantidad_obtenida }} </th>
         </tr>
-    </dl>
+        <tr>
+            <th> {{ form.calcular_compra }} <th>
+            <th> {{ form.confirmar_compra }} <th>
+        </tr>
     </table>
 </form>
+
+
 {% endblock %}

@@ -41,7 +41,7 @@
 {% for i in dict_monedas %}
     <tr>
         <td>{{ i }}</td>
-        <td>{{ dict_monedas[i][1] }}€</td>
+        <td>{{ dict_monedas[i][1]|round(3) }}€</td>
     </tr>
 {% endfor %}
 </table>

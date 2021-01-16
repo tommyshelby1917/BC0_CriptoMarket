@@ -79,7 +79,7 @@ def index():
     print(lista_movimientos)
 
     for moneda in lista_monedas:
-        valor_todas.append(consultaApi('EUR', moneda))
+        valor_todas.append(consultaApi(moneda, 'EUR'))
     
     dict_monedas = dict(zip(lista_monedas,valor_todas))
 
@@ -91,30 +91,42 @@ def purchase():
     
     # Formulario compra
     form = CompraForm(request.form)
-    
+
+    cantidad_obtenida = 0
+
     if request.method == 'POST':
         print("El methodo ha sido post!")
         if form.validate():
             print("Se ha validado!")
+
+            if form.calcular_compra.data:
+
+                total_compra = consultaApi(form.moneda_compra_from.data, form.moneda_compra_to.data, form.cantidad_compra.data)
+                print(float(total_compra[1]))
+                cantidad_obtenida = total_compra[1]
+
+                return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida)
             
-            total_compra = consultaApi(form.moneda_compra_from.data, form.moneda_compra_to.data, form.cantidad_compra.data)
+            elif form.confirmar_compra.data:
+                
+                total_compra = consultaApi(form.moneda_compra_from.data, form.moneda_compra_to.data, form.cantidad_compra.data)
+                print(float(total_compra[1]))
+                cantidad_obtenida = total_compra[1]
 
-            print(float(total_compra[1]))
+                consulta('INSERT INTO MOVEMENTS (date, time, from_moneda, from_cantidad, to_moneda, to_cantidad) VALUES (?, ?, ?, ?, ?, ? );', 
+                        (
+                            str(date.today()),
+                            str(datetime.now().time()),
+                            str(form.moneda_compra_from.data),
+                            float(form.cantidad_compra.data),
+                            str(form.moneda_compra_to.data),
+                            float(total_compra[1])
+                        )
+                )
 
-            consulta('INSERT INTO MOVEMENTS (date, time, from_moneda, from_cantidad, to_moneda, to_cantidad) VALUES (?, ?, ?, ?, ?, ? );', 
-                    (
-                        str(date.today()),
-                        str(datetime.now().time()),
-                        str(form.moneda_compra_from.data),
-                        float(form.cantidad_compra.data),
-                        str(form.moneda_compra_to.data),
-                        float(total_compra[1])
-                    )
-            )
-
-            return redirect(url_for('purchase'))
+                return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida)
         else:
-            return render_template("purchase.html", form=form)
+            return render_template("purchase.html", form=form, )
             
-    return render_template("purchase.html", form=form)
+    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida)
 
