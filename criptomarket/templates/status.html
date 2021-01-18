@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Estat de les inversions{% endblock %}
+{% block body %}
+<p>Estat de les teves inversions:</p>
+<table>
+    <tr>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Vas comprar:</th>
+        <th>Valor antic:</th>
+        <th>Valor actual:</th>
+        <th>Balanç</th>
+    </tr>
+{% if lista_movimientos |length > 0 %} 
+    {% for movimiento in lista_movimientos %}
+        <tr>
+            <td>{{ movimiento['date']}}</td>
+            <td>{{ movimiento['time'] }}</td>
+            <td>{{ movimiento['to_cantidad']|round(3) }} {{ movimiento['to_moneda'] }}</td>
+            <td>{{ valores_antiguos[loop.index0]|round(2) }}€</td>
+            <td>{{ valores_actuales[loop.index0]|round(2) }} </td>
+            <td>{{ valores_actuales[loop.index0]|round(0) - valores_antiguos[loop.index0]|round(0) }}</td>
+        </tr>
+    {% endfor %}
+{% else %}
+    <p>No hi ha hagut moviments fins ara</p>
+{% endif %}
+</table>
+<p> Balanç total: {{ total_balance }}€ </p> 
+{% endblock %}

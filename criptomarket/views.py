@@ -35,7 +35,7 @@ def consultaApi(fromMoneda, toMoneda, cantidad=1):
     
     return valor_from, valor_to
 
-print(consultaApi('EUR', 'BTC'))
+# print(consultaApi('EUR', 'BTC'))
 
 # Función de la query a la BD
 def consulta(query, params=()):
@@ -113,14 +113,15 @@ def purchase():
                 print(float(total_compra[1]))
                 cantidad_obtenida = total_compra[1]
 
-                consulta('INSERT INTO MOVEMENTS (date, time, from_moneda, from_cantidad, to_moneda, to_cantidad) VALUES (?, ?, ?, ?, ?, ? );', 
+                consulta('INSERT INTO MOVEMENTS (date, time, from_moneda, from_cantidad, to_moneda, to_cantidad, valor_en_euros) VALUES (?, ?, ?, ?, ?, ?, ? );', 
                         (
                             str(date.today()),
-                            str(datetime.now().time()),
+                            str(datetime.now().time().isoformat(timespec='seconds')),
                             str(form.moneda_compra_from.data),
                             float(form.cantidad_compra.data),
                             str(form.moneda_compra_to.data),
-                            float(total_compra[1])
+                            float(total_compra[1]),
+                            float(consultaApi(form.moneda_compra_from.data,'EUR',form.cantidad_compra.data)[1])
                         )
                 )
 
@@ -129,4 +130,23 @@ def purchase():
             return render_template("purchase.html", form=form, )
             
     return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida)
+
+@app.route('/status')
+def status():
+    
+    lista_movimientos = consulta('SELECT * FROM movements;')
+
+    # fromMoneda, toMoneda, cantidad=1
+    valores_actuales = []
+    for movimiento in lista_movimientos:
+        valores_actuales.append(consultaApi(movimiento['to_moneda'],'EUR',movimiento['to_cantidad'])[1])
+
+    valores_antiguos = []
+    for movimiento in lista_movimientos:
+        valores_antiguos.append(movimiento['valor_en_euros'])
+
+    total_balance = (round(sum(valores_actuales) - sum(valores_antiguos), 2))
+    print(total_balance)
+
+    return render_template("status.html", lista_movimientos=lista_movimientos, valores_actuales=valores_actuales, valores_antiguos=valores_antiguos, total_balance=total_balance)
 
