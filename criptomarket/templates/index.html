@@ -4,7 +4,25 @@
 <p>Benvigut a Criptomarket</p>
 
 <section>
-<p>Els teus moviments</p>
+<p>El teu wallet:</p>
+<table>
+    <tr>
+        <th>Moneda</th>
+        <th>Quantitat</th>
+    </tr>
+    {% for moneda, valor in wallet.items() %}
+    </tr>
+        <td>{{ moneda }}</td>
+        <td>{{ valor }}</td>
+    </tr>
+    {% endfor %}
+</table>
+</section>
+
+<hr>
+
+<section>
+<p>Els teus moviments:</p>
 <table>
     <tr>
         <th>Data</th>
@@ -30,7 +48,9 @@
 {% endif %}
 <table>
 </section>
+
 <hr>
+
 <section>
 <p>Informació sobre el preu en € de les nostres monedes disponibles:</p>
 <table>

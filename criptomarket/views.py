@@ -66,10 +66,28 @@ def consulta(query, params=()):
 
         return listaDeDiccionarios
 
+def calcularWallet():
+
+    wallet = {'EUR':30000, 'ETH':0, 'LTC':0,'BNB':0,'EOS':0,'XLM':0,'TRX':0,'BTC':0,'XRP':0,'BCH':0,'USDT':0,'BSV':0,'ADA':0}
+
+    lista_movimientos = consulta('SELECT * FROM movements;')
+
+    for movimiento in lista_movimientos:
+        wallet[movimiento['from_moneda']] = wallet[movimiento['from_moneda']] - movimiento['from_cantidad']
+        wallet[movimiento['to_moneda']] = wallet[movimiento['to_moneda']] + movimiento['to_cantidad']
+        
+    if wallet['EUR'] <= 0:
+        print('Te has quedado sin dinero puto pobre!')
+
+    return wallet
+
+
 
 # Renderizado home
 @app.route('/')
 def index():
+
+    wallet = calcularWallet()
 
     # Llista de monedes i valors a la home
     lista_monedas = ['ETH','LTC','BNB','EOS','XLM','TRX','BTC','XRP','BCH','USDT','BSV','ADA']
@@ -83,7 +101,7 @@ def index():
     
     dict_monedas = dict(zip(lista_monedas,valor_todas))
 
-    return render_template('index.html', dict_monedas=dict_monedas, lista_movimientos=lista_movimientos)
+    return render_template('index.html', dict_monedas=dict_monedas, lista_movimientos=lista_movimientos, wallet=wallet)
 
 # Renderizado registro
 @app.route('/purchase', methods=['GET', 'POST'])
