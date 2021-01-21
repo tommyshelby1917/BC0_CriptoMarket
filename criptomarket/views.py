@@ -81,8 +81,6 @@ def calcularWallet():
 
     return wallet
 
-
-
 # Renderizado home
 @app.route('/')
 def index():
@@ -154,7 +152,6 @@ def status():
     
     lista_movimientos = consulta('SELECT * FROM movements;')
 
-    # fromMoneda, toMoneda, cantidad=1
     valores_actuales = []
     for movimiento in lista_movimientos:
         valores_actuales.append(consultaApi(movimiento['to_moneda'],'EUR',movimiento['to_cantidad'])[1])
@@ -166,5 +163,7 @@ def status():
     total_balance = (round(sum(valores_actuales) - sum(valores_antiguos), 2))
     print(total_balance)
 
-    return render_template("status.html", lista_movimientos=lista_movimientos, valores_actuales=valores_actuales, valores_antiguos=valores_antiguos, total_balance=total_balance)
+    inversion_total = consulta("SELECT SUM(from_cantidad) FROM movements where from_moneda='EUR';")[0]['SUM(from_cantidad)']
+
+    return render_template("status.html", lista_movimientos=lista_movimientos, valores_actuales=valores_actuales, valores_antiguos=valores_antiguos, total_balance=total_balance, inversion_total=inversion_total)
 
