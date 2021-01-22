@@ -81,6 +81,8 @@ def calcularWallet():
 
     return wallet
 
+wallet = calcularWallet()
+
 # Renderizado home
 @app.route('/')
 def index():
@@ -117,17 +119,15 @@ def purchase():
 
             if form.calcular_compra.data:
 
-                total_compra = consultaApi(form.moneda_compra_from.data, form.moneda_compra_to.data, form.cantidad_compra.data)
-                print(float(total_compra[1]))
-                cantidad_obtenida = total_compra[1]
+                cantidad_obtenida = consultaApi(form.moneda_compra_from.data, form.moneda_compra_to.data, form.cantidad_compra.data)[1]
 
-                return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida)
+                precio_unidad = consultaApi(form.moneda_compra_to.data, 'EUR', 1)[1]
+
+                return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data)
             
             elif form.confirmar_compra.data:
                 
-                total_compra = consultaApi(form.moneda_compra_from.data, form.moneda_compra_to.data, form.cantidad_compra.data)
-                print(float(total_compra[1]))
-                cantidad_obtenida = total_compra[1]
+                cantidad_obtenida = consultaApi(form.moneda_compra_from.data, form.moneda_compra_to.data, form.cantidad_compra.data)[1]
 
                 consulta('INSERT INTO MOVEMENTS (date, time, from_moneda, from_cantidad, to_moneda, to_cantidad, valor_en_euros) VALUES (?, ?, ?, ?, ?, ?, ? );', 
                         (
@@ -161,7 +161,6 @@ def status():
         valores_antiguos.append(movimiento['valor_en_euros'])
 
     total_balance = (round(sum(valores_actuales) - sum(valores_antiguos), 2))
-    print(total_balance)
 
     inversion_total = consulta("SELECT SUM(from_cantidad) FROM movements where from_moneda='EUR';")[0]['SUM(from_cantidad)']
 

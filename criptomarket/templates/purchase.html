@@ -14,7 +14,8 @@
         </tr>
         <tr>
             <th> {{ render_field(form.cantidad_compra) }} </th>
-            <th> {{ cantidad_obtenida }} </th>
+            <th> <b>Son un total de:</b><br>{{ cantidad_obtenida }} {{ moneda_to }} </th>
+            <th> <b>Precio unidad:</b><br>{{ precio_unidad|round(2) }} </th>
         </tr>
         <tr>
             <th> {{ form.calcular_compra }} <th>
