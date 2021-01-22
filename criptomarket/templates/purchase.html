@@ -14,15 +14,27 @@
         </tr>
         <tr>
             <th> {{ render_field(form.cantidad_compra) }} </th>
-            <th> <b>Son un total de:</b><br>{{ cantidad_obtenida }} {{ moneda_to }} </th>
-            <th> <b>Precio unidad:</b><br>{{ precio_unidad|round(2) }} </th>
+            {% if cantidad_obtenida == 0 %}
+                <th> <b>Són un total de:</b><br>... </th>
+                <th> <b>Preu unitat:</b><br>... </th>
+            {% else %}
+                <th> <b>Són un total de:</b><br>{{ cantidad_obtenida|round(5)}} {{ moneda_to }} </th>
+                <th> <b>Preu unitat:</b><br>{{ precio_unidad|round(2)}} € </th>
+            {% endif %}
         </tr>
         <tr>
-            <th> {{ form.calcular_compra }} <th>
-            <th> {{ form.confirmar_compra }} <th>
+            <th> {{ form.calcular_compra }} </th>
+            <th> {{ form.confirmar_compra }} </th>
         </tr>
     </table>
 </form>
 
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    {% for message in messages %}
+        <p id="error"><b> {{ message }} </b></p>
+    {% endfor %}
+{% endif %}
+{% endwith %}
 
 {% endblock %}

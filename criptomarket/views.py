@@ -68,10 +68,12 @@ def consulta(query, params=()):
 
 def calcularWallet():
 
+    # 30.000€ iniciales para invertir
     wallet = {'EUR':30000, 'ETH':0, 'LTC':0,'BNB':0,'EOS':0,'XLM':0,'TRX':0,'BTC':0,'XRP':0,'BCH':0,'USDT':0,'BSV':0,'ADA':0}
 
     lista_movimientos = consulta('SELECT * FROM movements;')
 
+    # Suma y resta calculando el valor de tu wallet
     for movimiento in lista_movimientos:
         wallet[movimiento['from_moneda']] = wallet[movimiento['from_moneda']] - movimiento['from_cantidad']
         wallet[movimiento['to_moneda']] = wallet[movimiento['to_moneda']] + movimiento['to_cantidad']
@@ -110,42 +112,54 @@ def purchase():
     # Formulario compra
     form = CompraForm(request.form)
 
+    # Calculamos wallet
+    wallet = calcularWallet()
+
+    print(wallet['EUR'])
+
+    # Iniciamos variables
     cantidad_obtenida = 0
+    precio_unidad = 0
 
     if request.method == 'POST':
         print("El methodo ha sido post!")
         if form.validate():
-            print("Se ha validado!")
+            
+            cantidad_obtenida = consultaApi(form.moneda_compra_from.data, form.moneda_compra_to.data, form.cantidad_compra.data)[1]
+
+            precio_unidad = consultaApi(form.moneda_compra_to.data, 'EUR', 1)[1]
 
             if form.calcular_compra.data:
-
-                cantidad_obtenida = consultaApi(form.moneda_compra_from.data, form.moneda_compra_to.data, form.cantidad_compra.data)[1]
-
-                precio_unidad = consultaApi(form.moneda_compra_to.data, 'EUR', 1)[1]
 
                 return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data)
             
             elif form.confirmar_compra.data:
                 
-                cantidad_obtenida = consultaApi(form.moneda_compra_from.data, form.moneda_compra_to.data, form.cantidad_compra.data)[1]
+                if form.cantidad_compra.data > wallet[form.moneda_compra_from.data]:
+                    flash("No tens suficienment crèdit. No s'ha registrat la compra.")
+                    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data)
+                
+                else:
+                    # Registra movimiento en la database
+                    consulta('INSERT INTO MOVEMENTS (date, time, from_moneda, from_cantidad, to_moneda, to_cantidad, valor_en_euros) VALUES (?, ?, ?, ?, ?, ?, ? );', 
+                            (
+                                str(date.today()),
+                                str(datetime.now().time().isoformat(timespec='seconds')),
+                                str(form.moneda_compra_from.data),
+                                float(form.cantidad_compra.data),
+                                str(form.moneda_compra_to.data),
+                                float(cantidad_obtenida),
+                                float(consultaApi(form.moneda_compra_from.data,'EUR',form.cantidad_compra.data)[1])
+                            )
+                    )
 
-                consulta('INSERT INTO MOVEMENTS (date, time, from_moneda, from_cantidad, to_moneda, to_cantidad, valor_en_euros) VALUES (?, ?, ?, ?, ?, ?, ? );', 
-                        (
-                            str(date.today()),
-                            str(datetime.now().time().isoformat(timespec='seconds')),
-                            str(form.moneda_compra_from.data),
-                            float(form.cantidad_compra.data),
-                            str(form.moneda_compra_to.data),
-                            float(total_compra[1]),
-                            float(consultaApi(form.moneda_compra_from.data,'EUR',form.cantidad_compra.data)[1])
-                        )
-                )
+                    flash("Compra efectuada correctament!")
 
-                return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida)
+                    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data)
         else:
-            return render_template("purchase.html", form=form, )
+            return render_template("purchase.html", form=form,)
             
-    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida)
+    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad)
 
 @app.route('/status')
 def status():
