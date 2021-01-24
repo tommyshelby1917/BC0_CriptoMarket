@@ -79,7 +79,7 @@ def calcularWallet():
         wallet[movimiento['to_moneda']] = wallet[movimiento['to_moneda']] + movimiento['to_cantidad']
         
     if wallet['EUR'] <= 0:
-        print('Te has quedado sin dinero puto pobre!')
+        print('Tu saldo actual en € es igual a 0')
 
     return wallet
 
@@ -120,6 +120,7 @@ def purchase():
     # Iniciamos variables
     cantidad_obtenida = 0
     precio_unidad = 0
+    calculando = False
 
     if request.method == 'POST':
         print("El methodo ha sido post!")
@@ -129,35 +130,44 @@ def purchase():
 
             precio_unidad = consultaApi(form.moneda_compra_to.data, 'EUR', 1)[1]
 
-            if form.calcular_compra.data:
+            if form.moneda_compra_from.data != form.moneda_compra_to.data:
 
-                return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data)
-            
-            elif form.confirmar_compra.data:
+                if form.calcular_compra.data:
+
+                    calculando = True
+
+                    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data, calculando=calculando)
                 
-                if form.cantidad_compra.data > wallet[form.moneda_compra_from.data]:
-                    flash("No tens suficienment crèdit. No s'ha registrat la compra.")
-                    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data)
-                
-                else:
-                    # Registra movimiento en la database
-                    consulta('INSERT INTO MOVEMENTS (date, time, from_moneda, from_cantidad, to_moneda, to_cantidad, valor_en_euros) VALUES (?, ?, ?, ?, ?, ?, ? );', 
-                            (
-                                str(date.today()),
-                                str(datetime.now().time().isoformat(timespec='seconds')),
-                                str(form.moneda_compra_from.data),
-                                float(form.cantidad_compra.data),
-                                str(form.moneda_compra_to.data),
-                                float(cantidad_obtenida),
-                                float(consultaApi(form.moneda_compra_from.data,'EUR',form.cantidad_compra.data)[1])
-                            )
-                    )
+                elif form.confirmar_compra.data:
+                    
+                    if form.cantidad_compra.data > wallet[form.moneda_compra_from.data]:
+                        flash("No tens suficienment crèdit. No s'ha registrat la compra.")
+                        return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data)
+                    
+                    else:
+                        # Registra movimiento en la database
+                        consulta('INSERT INTO MOVEMENTS (date, time, from_moneda, from_cantidad, to_moneda, to_cantidad, valor_en_euros) VALUES (?, ?, ?, ?, ?, ?, ? );', 
+                                (
+                                    str(date.today()),
+                                    str(datetime.now().time().isoformat(timespec='seconds')),
+                                    str(form.moneda_compra_from.data),
+                                    float(form.cantidad_compra.data),
+                                    str(form.moneda_compra_to.data),
+                                    float(cantidad_obtenida),
+                                    float(consultaApi(form.moneda_compra_from.data,'EUR',form.cantidad_compra.data)[1])
+                                )
+                        )
 
-                    flash("Compra efectuada correctament!")
+                        flash("Compra efectuada correctament!")
 
-                    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data)
+                        return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data)
+            else:
+                flash("La moneda de compra i venta no poden ser la mateixa.")
+                return render_template("purchase.html", form=form, cantidad_obtenida=0, precio_unidad=0)
+
+        
         else:
-            return render_template("purchase.html", form=form,)
+            return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad)
             
     return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad)
 

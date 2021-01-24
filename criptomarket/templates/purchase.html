@@ -1,33 +1,54 @@
 {% extends 'base.html' %}
 {% block title %} Registra't a Criptomarket {% endblock %}
 {% block body %}
-{% from "_formhelpers.html" import render_field %}
 <h2>Què vols fer?</h2>
 
 <h2>Fes una compra de criptomoneda</h2>
 <form method=post >
     {{ form.csrf_token }}
-    <table>
-        <tr>
-            <th> {{ render_field(form.moneda_compra_from) }} </th>
-            <th> {{ render_field(form.moneda_compra_to) }} </th>
-        </tr>
-        <tr>
-            <th> {{ render_field(form.cantidad_compra) }} </th>
-            {% if cantidad_obtenida == 0 %}
-                <th> <b>Són un total de:</b><br>... </th>
-                <th> <b>Preu unitat:</b><br>... </th>
-            {% else %}
-                <th> <b>Són un total de:</b><br>{{ cantidad_obtenida|round(5)}} {{ moneda_to }} </th>
-                <th> <b>Preu unitat:</b><br>{{ precio_unidad|round(2)}} € </th>
-            {% endif %}
-        </tr>
-        <tr>
-            <th> {{ form.calcular_compra }} </th>
-            <th> {{ form.confirmar_compra }} </th>
-        </tr>
-    </table>
-</form>
+        <table>
+        {% if calculando == True %}
+            <tr>
+                <th style="display:none"> {{ form.moneda_compra_from.label }} <br> {{ form.moneda_compra_from }} </th>
+                <th style="display:none"> {{ form.moneda_compra_to.label }} <br> {{ form.moneda_compra_to }} </th>
+            </tr>
+            <tr>
+                <th> {{ form.cantidad_compra.label }} <br> 
+                    {{ form.cantidad_compra(readonly=true) }}
+                    {% for error in form.cantidad_compra.errors %}
+                        <p class="err-msg">
+                            {{ error }}
+                        </p>
+                    {% endfor %}
+                </th>
+        {% else %}
+            <tr>
+                <th> {{ form.moneda_compra_from.label }} <br> {{ form.moneda_compra_from }} </th>
+                <th> {{ form.moneda_compra_to.label }} <br> {{ form.moneda_compra_to }} </th>
+            </tr>
+            <tr>
+                <th> {{ form.cantidad_compra.label }} <br> 
+                    {{ form.cantidad_compra }}
+                    {% for error in form.cantidad_compra.errors %}
+                        <p class="err-msg">
+                            {{ error }}
+                        </p>
+                    {% endfor %}
+                </th>
+        {% endif %}
+                {% if cantidad_obtenida is string or cantidad_obtenida == 0 %}
+                    <th> <b>Son un total de:</b><br>... </th>
+                    <th> <b>Preu unitat:</b><br>... </th>
+                {% else %}
+                    <th> <b>Són un total de:</b><br>{{ cantidad_obtenida|round(5)}} {{ moneda_to }} </th>
+                    <th> <b>Preu unitat:</b><br>{{ precio_unidad|round(2)}} € </th>
+                {% endif %}
+            </tr>
+            <tr>
+                <th> {{ form.calcular_compra }} </th>
+                <th> {{ form.confirmar_compra }} </th>
+            </tr>
+        </table>
 
 {% with messages = get_flashed_messages() %}
 {% if messages %}
