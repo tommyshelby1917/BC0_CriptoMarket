@@ -1,13 +1,18 @@
 {% extends 'base.html' %}
 {% block title %} Benvinguda {% endblock %}
 {% block body %}
+
 <h1>Benvigut a Criptomarket</h1>
 
 <div class="container">
-    <div class="row">
-        <div class="three columns">
-            <p>El teu wallet:</p>
-            <table>
+    <div class="row wallet">
+        
+        <div class="one-half column">
+            <h1 class="texto-portada">El teu wallet:</h1>
+        </div>
+
+        <div class="one-half column">
+            <table class="wallet">
                 <tr>
                     <th>Moneda</th>
                     <th>Quantitat</th>
@@ -21,9 +26,12 @@
             </table>
         </div>
 
-        <div class="five columns">
-            <p>Els teus moviments:</p>
-            <table>
+    </div>
+
+    <div class="row moviments">
+
+        <div class="one-half column">
+            <table class="moviments">
                 <tr>
                     <th>Data</th>
                     <th>Hora</th>
@@ -49,9 +57,20 @@
             </table>
         </div>
 
-        <div class="four columns">
-            <p>Informació sobre el preu en € de les nostres monedes disponibles:</p>
-            <table>
+        <div class="one-half column">
+            <h1 class="texto-portada">Els teus moviments:</h1>
+        </div>
+
+    </div>
+
+    <div class="row preus">
+
+        <div class="one-half column">
+            <h1 class="texto-portada">Informació del preu:</h1>
+        </div>
+
+        <div class="one-half column">
+            <table class="preus">
                 <tr>
                     <th>Moneda</th>
                     <th>Preu</th>
@@ -66,7 +85,7 @@
         </div>
 
     </div>
-</div>
 
+</div>
 
 {% endblock %}

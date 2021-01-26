@@ -89,21 +89,26 @@ wallet = calcularWallet()
 @app.route('/')
 def index():
 
+    # Monedes amb crèdit
     wallet = calcularWallet()
+    monedas_con_credito = {}
+
+    for valor in wallet:
+        if wallet[valor] > 0:
+            monedas_con_credito[valor] = wallet[valor]
 
     # Llista de monedes i valors a la home
     lista_monedas = ['ETH','LTC','BNB','EOS','XLM','TRX','BTC','XRP','BCH','USDT','BSV','ADA']
     valor_todas = []
 
     lista_movimientos = consulta('SELECT * FROM movements;')
-    print(lista_movimientos)
 
     for moneda in lista_monedas:
         valor_todas.append(consultaApi(moneda, 'EUR'))
     
     dict_monedas = dict(zip(lista_monedas,valor_todas))
 
-    return render_template('index.html', dict_monedas=dict_monedas, lista_movimientos=lista_movimientos, wallet=wallet)
+    return render_template('index.html', dict_monedas=dict_monedas, lista_movimientos=lista_movimientos, wallet=monedas_con_credito)
 
 # Renderizado registro
 @app.route('/purchase', methods=['GET', 'POST'])

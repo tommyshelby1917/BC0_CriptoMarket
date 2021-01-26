@@ -3,3 +3,31 @@
     background-color: red;
     color: white;
 }
+
+.wallet {
+    display: flex;
+    justify-content: center;
+    background-color: #0d0d51;
+    color: #fff;
+}
+
+.moviments {
+    display: flex;
+    justify-content: center;
+    background-color: #F1918E;
+    color: #fff;
+}
+
+.preus {
+    display: flex;
+    justify-content: center;
+    background-color: #4B1DC0;
+    color: #fff;
+}
+
+.texto-portada {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+}
