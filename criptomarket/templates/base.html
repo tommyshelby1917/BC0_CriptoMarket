@@ -4,19 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="css/main.css">
     <script src="https://kit.fontawesome.com/9d4352a4a2.js" crossorigin="anonymous"></script>
+
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+    <!-- CSS –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="stylesheet" href="/static/css/normalize.css">
+    <link rel="stylesheet" href="/static/css/skeleton.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+
+    <!-- Favicon
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="icon" type="image/png" href="criptomarket/static/images/favicon.png">
 
 </head>
 <body>
-    <h1>Criptomarket, consulta el mercat de la criptomoneda amb tota la confiança.</h1>
     <div class="container">
-        <p class=menu>
-            <i class="fa fa-home"></i> <a href="./">Benvinguda</a> | 
-            <i class="fa fa-money"></i> <a href="./purchase">Fes una compra</a> |
-            <i class="fa fa-calculator"></i> <a href="./status">Inversions</a> |
-        </p>
-                
+        <h1>Criptomarket, consulta el mercat de la criptomoneda amb tota la confiança.</h1>
+        <div class="row">
+            <nav class="navbar">
+                <a href="./" class="button xs-eleven xs-offset-by-four sm-three md-two md-offset-by-three lg-two lg-offset-by-four four columns menu-button fa fa-home">Benvinguda</a>
+                <a href="./purchase" class="button xs-eleven xs-offset-by-four sm-three md-two md-offset-by-three lg-two lg-offset-by-four four columns menu-button fa fa-money">Fes una compra</a>
+                <a href="./status" class="button xs-eleven sm-three md-two lg-two four columns menu-button fa fa-calculator">Inversions</a>
+            </nav>
+        </div>
+        
+        <hr class="menu-divider">
+    </div>
         {% block body %}
         {% endblock %}
     </div>

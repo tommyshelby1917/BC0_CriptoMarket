@@ -1,70 +1,72 @@
 {% extends 'base.html' %}
 {% block title %} Benvinguda {% endblock %}
 {% block body %}
-<p>Benvigut a Criptomarket</p>
+<h1>Benvigut a Criptomarket</h1>
 
-<section>
-<p>El teu wallet:</p>
-<table>
-    <tr>
-        <th>Moneda</th>
-        <th>Quantitat</th>
-    </tr>
-    {% for moneda, valor in wallet.items() %}
-    </tr>
-        <td>{{ moneda }}</td>
-        <td>{{ valor }}</td>
-    </tr>
-    {% endfor %}
-</table>
-</section>
+<div class="container">
+    <div class="row">
+        <div class="three columns">
+            <p>El teu wallet:</p>
+            <table>
+                <tr>
+                    <th>Moneda</th>
+                    <th>Quantitat</th>
+                </tr>
+                {% for moneda, valor in wallet.items() %}
+                </tr>
+                    <td>{{ moneda }}</td>
+                    <td>{{ valor }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
 
-<hr>
+        <div class="five columns">
+            <p>Els teus moviments:</p>
+            <table>
+                <tr>
+                    <th>Data</th>
+                    <th>Hora</th>
+                    <th>De</th>
+                    <th>Quantitat</th>
+                    <th>A</th>
+                    <th>Quantitat</th>
+                </tr>
+            {% if lista_movimientos |length > 0 %} 
+                {% for movimiento in lista_movimientos %}
+                    <tr>
+                        <td>{{ movimiento['date']}}</td>
+                        <td>{{ movimiento['time'] }}</td>
+                        <td>{{ movimiento['from_moneda'] }}</td>
+                        <td>{{ movimiento['from_cantidad'] }}</td>
+                        <td>{{ movimiento['to_moneda'] }}</td>
+                        <td>{{ movimiento['to_cantidad'] }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <p>No hi ha hagut moviments fins ara</p>
+            {% endif %}
+            </table>
+        </div>
 
-<section>
-<p>Els teus moviments:</p>
-<table>
-    <tr>
-        <th>Data</th>
-        <th>Hora</th>
-        <th>De</th>
-        <th>Quantitat</th>
-        <th>A</th>
-        <th>Quantitat</th>
-    </tr>
-{% if lista_movimientos |length > 0 %} 
-    {% for movimiento in lista_movimientos %}
-        <tr>
-            <td>{{ movimiento['date']}}</td>
-            <td>{{ movimiento['time'] }}</td>
-            <td>{{ movimiento['from_moneda'] }}</td>
-            <td>{{ movimiento['from_cantidad'] }}</td>
-            <td>{{ movimiento['to_moneda'] }}</td>
-            <td>{{ movimiento['to_cantidad'] }}</td>
-        </tr>
-    {% endfor %}
-{% else %}
-    <p>No hi ha hagut moviments fins ara</p>
-{% endif %}
-<table>
-</section>
+        <div class="four columns">
+            <p>Informació sobre el preu en € de les nostres monedes disponibles:</p>
+            <table>
+                <tr>
+                    <th>Moneda</th>
+                    <th>Preu</th>
+                </tr>
+            {% for i in dict_monedas %}
+                <tr>
+                    <td>{{ i }}</td>
+                    <td>{{ dict_monedas[i][1]|round(3) }}€</td>
+                </tr>
+            {% endfor %}
+            </table>    
+        </div>
 
-<hr>
+    </div>
+</div>
 
-<section>
-<p>Informació sobre el preu en € de les nostres monedes disponibles:</p>
-<table>
-    <tr>
-        <th>Moneda</th>
-        <th>Preu</th>
-    </tr>
-{% for i in dict_monedas %}
-    <tr>
-        <td>{{ i }}</td>
-        <td>{{ dict_monedas[i][1]|round(3) }}€</td>
-    </tr>
-{% endfor %}
-</table>
-</section>
 
 {% endblock %}
