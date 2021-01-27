@@ -26,13 +26,14 @@ def consultaApi(fromMoneda, toMoneda, cantidad=1):
     try:
         response = session.get(url, params=None)
         data = json.loads(response.text)
+            
+        valor_from = round(data['data']['amount'], 10)
+        valor_to = round(data['data']['quote'][toMoneda]['price'], 10)
+    
         
-    except (ConnectionError, Timeout, TooManyRedirects) as errores:
-        print(errores)
-    
-    valor_from = round(data['data']['amount'], 10)
-    valor_to = round(data['data']['quote'][toMoneda]['price'], 10)
-    
+    except (ConnectionError, Timeout, TooManyRedirects, KeyError) as errores:
+        raise BufferError
+
     return valor_from, valor_to
 
 # print(consultaApi('EUR', 'BTC'))
@@ -89,7 +90,7 @@ wallet = calcularWallet()
 @app.route('/')
 def index():
 
-    # Monedes amb crèdit
+    # El teu wallet
     wallet = calcularWallet()
     monedas_con_credito = {}
 
@@ -117,18 +118,29 @@ def purchase():
     # Formulario compra
     form = CompraForm(request.form)
 
-    # Calculamos wallet
-    wallet = calcularWallet()
-
-    print(wallet['EUR'])
-
     # Iniciamos variables
+    wallet = calcularWallet()
     cantidad_obtenida = 0
     precio_unidad = 0
     calculando = False
 
+    # El teu wallet
+    monedas_con_credito = {}
+
+    for valor in wallet:
+        if wallet[valor] > 0:
+            monedas_con_credito[valor] = wallet[valor]   
+
+    # Seleccion de monedas con fondos
+    monedas_disponibles = []
+    for moneda in wallet:
+        if wallet[moneda] > 0:
+            monedas_disponibles.append(moneda)
+    form.moneda_compra_from.choices = monedas_disponibles
+
     if request.method == 'POST':
         print("El methodo ha sido post!")
+
         if form.validate():
             
             cantidad_obtenida = consultaApi(form.moneda_compra_from.data, form.moneda_compra_to.data, form.cantidad_compra.data)[1]
@@ -141,40 +153,48 @@ def purchase():
 
                     calculando = True
 
-                    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data, calculando=calculando)
+                    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data, calculando=calculando, wallet=monedas_con_credito)
                 
                 elif form.confirmar_compra.data:
                     
                     if form.cantidad_compra.data > wallet[form.moneda_compra_from.data]:
                         flash("No tens suficienment crèdit. No s'ha registrat la compra.")
-                        return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data)
+                        return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data, wallet=monedas_con_credito)
                     
                     else:
-                        # Registra movimiento en la database
-                        consulta('INSERT INTO MOVEMENTS (date, time, from_moneda, from_cantidad, to_moneda, to_cantidad, valor_en_euros) VALUES (?, ?, ?, ?, ?, ?, ? );', 
-                                (
-                                    str(date.today()),
-                                    str(datetime.now().time().isoformat(timespec='seconds')),
-                                    str(form.moneda_compra_from.data),
-                                    float(form.cantidad_compra.data),
-                                    str(form.moneda_compra_to.data),
-                                    float(cantidad_obtenida),
-                                    float(consultaApi(form.moneda_compra_from.data,'EUR',form.cantidad_compra.data)[1])
-                                )
-                        )
 
-                        flash("Compra efectuada correctament!")
+                        try:
+                            # Registra movimiento en la database
+                            consulta('INSERT INTO MOVEMENTS (date, time, from_moneda, from_cantidad, to_moneda, to_cantidad, valor_en_euros) VALUES (?, ?, ?, ?, ?, ?, ? );', 
+                                    (
+                                        str(date.today()),
+                                        str(datetime.now().time().isoformat(timespec='seconds')),
+                                        str(form.moneda_compra_from.data),
+                                        float(form.cantidad_compra.data),
+                                        str(form.moneda_compra_to.data),
+                                        float(cantidad_obtenida),
+                                        float(consultaApi(form.moneda_compra_from.data,'EUR',form.cantidad_compra.data)[1])
+                                    )
+                            )
 
-                        return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data)
+                            flash("Compra efectuada correctament!")
+                            
+                            redirect(url_for("index"))
+                        
+                        except:
+                            raise BufferError
+
+
+                    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data, wallet=monedas_con_credito)
             else:
                 flash("La moneda de compra i venta no poden ser la mateixa.")
-                return render_template("purchase.html", form=form, cantidad_obtenida=0, precio_unidad=0)
+                return render_template("purchase.html", form=form, cantidad_obtenida=0, precio_unidad=0, wallet=monedas_con_credito)
 
         
         else:
-            return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad)
+            return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, wallet=monedas_con_credito)
             
-    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad)
+    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, wallet=monedas_con_credito)
 
 @app.route('/status')
 def status():
@@ -194,4 +214,21 @@ def status():
     inversion_total = consulta("SELECT SUM(from_cantidad) FROM movements where from_moneda='EUR';")[0]['SUM(from_cantidad)']
 
     return render_template("status.html", lista_movimientos=lista_movimientos, valores_actuales=valores_actuales, valores_antiguos=valores_antiguos, total_balance=total_balance, inversion_total=inversion_total)
+
+@app.errorhandler(404)
+def page_not_found(e):
+    print("Error 404!")
+    return render_template('404.html'), 404
+
+@app.errorhandler(BufferError)
+def buffer_error(e):
+    print("Error de conexión con la API!")
+    return render_template('apierror.html'), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    print("Error interno!")
+    return render_template('500.html'), 500
+
+
 

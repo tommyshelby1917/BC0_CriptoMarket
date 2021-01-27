@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %} Error 500 {% endblock %}
+{% block content %}
+    <h1>Un error no esperat ha ocorregut.</h1>
+    <p>Perdona per les molèsties.</p>
+    <p><a href="{{ url_for('index') }}">Torna a la home</a></p>
+{% endblock %}

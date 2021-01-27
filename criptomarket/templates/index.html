@@ -32,6 +32,7 @@
 
         <div class="one-half column">
             <table class="moviments">
+                {% if lista_movimientos |length > 0 %} 
                 <tr>
                     <th>Data</th>
                     <th>Hora</th>
@@ -40,7 +41,6 @@
                     <th>A</th>
                     <th>Quantitat</th>
                 </tr>
-            {% if lista_movimientos |length > 0 %} 
                 {% for movimiento in lista_movimientos %}
                     <tr>
                         <td>{{ movimiento['date']}}</td>
