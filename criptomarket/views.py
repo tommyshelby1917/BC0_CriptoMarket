@@ -223,12 +223,17 @@ def page_not_found(e):
 @app.errorhandler(BufferError)
 def buffer_error(e):
     print("Error de conexión con la API!")
-    return render_template('apierror.html'), 404
+    return render_template('apierror.html'), 500
 
 @app.errorhandler(500)
 def internal_error(error):
     print("Error interno!")
     return render_template('500.html'), 500
+
+@app.errorhandler(TypeError)
+def type_error(error):
+    print("Error interno!")
+    return render_template('apierror.html'), 500
 
 
 

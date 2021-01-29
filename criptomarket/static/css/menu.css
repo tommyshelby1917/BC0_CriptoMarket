@@ -57,3 +57,7 @@
     line-height: 2.5rem;
     
 }
+
+.boton-menu{
+    pointer-events: none;
+}

@@ -1,0 +1,21 @@
+.purchase {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px;
+    color: white;
+    background-color: #0f62ff;
+}
+
+#calcular_compra, #confirmar_compra{
+    color: white;
+    border-color: white;
+}
+
+#calcular_compra:hover, #confirmar_compra:hover{
+    color: #ffe56f;
+    border-color: #ffe56f;
+    outline: 0; 
+    background-color: #0f62ff;
+}

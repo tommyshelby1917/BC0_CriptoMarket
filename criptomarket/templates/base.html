@@ -12,31 +12,32 @@
     <link rel="stylesheet" href="/static/css/normalize.css">
     <link rel="stylesheet" href="/static/css/skeleton.css">
     <link rel="stylesheet" href="/static/css/main.css">
-
+    <link rel="stylesheet" href="/static/css/purchase.css">
+    <link rel="stylesheet" href="/static/css/status.css">
     <!-- Favicon
     –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-    <link rel="icon" type="image/png" href="criptomarket/static/images/favicon.png">
-
 </head>
 <body>
-    <div class="container">
-        <h1>Criptomarket, consulta el mercat de la criptomoneda amb tota la confiança.</h1>
+    <div class="container cabecera">
+        <img id="logo" src="{{url_for('static', filename='images/logo.png')}}" align="middle" />
+        <h3 style="margin-top: -44px; margin-bottom: 30px; LETTER-SPACING: 10px; font-size: 15px;">UN CRIPTOSIMULADOR QUALSEVOL</h3>
+
         <div class="row">
             <nav class="navbar">
-                <a href="./" class="button xs-eleven xs-offset-by-four sm-three md-two md-offset-by-three lg-two lg-offset-by-four four columns menu-button fa fa-home"> Benvinguda</a>
-                <a href="./purchase" class="button xs-eleven xs-offset-by-four sm-three md-two md-offset-by-three lg-two lg-offset-by-four four columns menu-button fa fa-money"> Fes una compra</a>
-                <a href="./status" class="button xs-eleven sm-three md-two lg-two four columns menu-button fa fa-calculator"> Inversions</a>
+                <a href="./" class="button xs-eleven xs-offset-by-four sm-three md-two md-offset-by-three lg-two lg-offset-by-four four columns menu-button boton-menu fa fa-home"> Home</a>
+                <a href="./purchase" class="button xs-eleven xs-offset-by-four sm-three md-two md-offset-by-three lg-two lg-offset-by-four four columns menu-button boton-menu fa fa-money"> Compra</a>
+                <a href="./status" class="button xs-eleven sm-three md-two lg-two four columns menu-button boton-menu fa fa-calculator"> Estat</a>
             </nav>
         </div>
         
         <hr class="menu-divider">
     </div>
+
         {% block body %}
         {% endblock %}
     </div>
-    <footer>
+    <footer class="cabecera">
     <p align="center">Criptomarket &copy;2021 <br> Josep Miquel Arenas | KeepCoding BC0</p>
-    <a href="mailto:josepmiquel@exilium.cat" align="center">josepmiquel@exilium.cat</a>
     
     </footer>
 </body>

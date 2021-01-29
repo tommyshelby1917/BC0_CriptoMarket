@@ -2,16 +2,15 @@
 {% block title %} Benvinguda {% endblock %}
 {% block body %}
 
-<h1>Benvigut a Criptomarket</h1>
-
 <div class="container">
     <div class="row wallet">
         
-        <div class="one-half column">
-            <h1 class="texto-portada">El teu wallet:</h1>
+        <div class="four columns" style="transform: rotate(-90deg);">
+            <h1 class="texto-portada">WALLET.</h1>
+            <i class="fas fa-wallet icones"></i>
         </div>
 
-        <div class="one-half column">
+        <div class="eight columns">
             <table class="wallet">
                 <tr>
                     <th>Moneda</th>
@@ -30,7 +29,7 @@
 
     <div class="row moviments">
 
-        <div class="one-half column">
+        <div class="eight columns">
             <table class="moviments">
                 {% if lista_movimientos |length > 0 %} 
                 <tr>
@@ -57,19 +56,21 @@
             </table>
         </div>
 
-        <div class="one-half column">
-            <h1 class="texto-portada">Els teus moviments:</h1>
+        <div class="four columns" style="transform: rotate(+90deg);">
+            <h1 class="texto-portada">MVMNTS.</h1>
+            <i class="fas fa-file-medical-alt icones"></i>
         </div>
 
     </div>
 
     <div class="row preus">
 
-        <div class="one-half column">
-            <h1 class="texto-portada">Informació del preu:</h1>
+        <div class="four columns" style="transform: rotate(-90deg);">
+            <h1 class="texto-portada">PREUS.</h1>
+            <td class="icona-centrada"><i class="fas fa-dollar-sign icones"></i></td>
         </div>
 
-        <div class="one-half column">
+        <div class="eight columns">
             <table class="preus">
                 <tr>
                     <th>Moneda</th>

@@ -2,13 +2,12 @@
 {% block title %} Registra't a Criptomarket {% endblock %}
 {% block body %}
 
-<h2>Fes una compra de criptomoneda</h2>
-
-<div class="container">
+<div class="container purchase">
+    <h2 class="titulo-seccion">CMPRA. VNTA. CRPTOMNDA.</h2> 
     <div class="row">
         
         <div class="one-half column">
-            <h1>El teu wallet:</h1>
+            <i class="fas fa-wallet" style="font-size: 40px; align-text: center; padding-bottom:30px;"></i>
 
             <table>
                 <tr>
@@ -25,6 +24,7 @@
         </div>
 
     <div class="one-half column">
+    <i class="fas fa-shopping-cart" style="font-size: 40px; align-text: center; padding-bottom: 20px;"></i>
         <form method=post >
             {{ form.csrf_token }}
                 <table>
