@@ -1,6 +1,7 @@
 venv/
 __pycache__
 config.py
-criptomarket/data
+criptomarket/data/criptomarket.db
+criptomarket/data/criptomarket.sqbpro
 .DS_Store
 criptomarket/.DS_Store

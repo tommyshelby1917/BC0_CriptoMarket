@@ -6,4 +6,10 @@
     padding: 50px;
     color: white;
     background-color: #0f62ff;
+    background-image: url("https://www.transparenttextures.com/patterns/black-linen-2.png");
+}
+
+.status:hover {
+    background-color: #002975;
+    background-image: url("https://www.transparenttextures.com/patterns/black-linen-2.png");
 }
