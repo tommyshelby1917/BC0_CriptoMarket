@@ -24,9 +24,24 @@
 
         <div class="row">
             <nav class="navbar">
+                {% if request.path == '/' %}
+                <a href="./" class="button xs-eleven xs-offset-by-four sm-three md-two md-offset-by-three lg-two lg-offset-by-four four columns menu-button boton-menu fa fa-home" style="pointer-events:none; color:blue; border-color:blue;"> Holi</a>
+                {% else %}
                 <a href="./" class="button xs-eleven xs-offset-by-four sm-three md-two md-offset-by-three lg-two lg-offset-by-four four columns menu-button boton-menu fa fa-home"> Home</a>
+                {% endif %}
+
+                {% if request.path == '/purchase' %}
+                <a href="./purchase" class="button xs-eleven xs-offset-by-four sm-three md-two md-offset-by-three lg-two lg-offset-by-four four columns menu-button boton-menu fa fa-money" style="pointer-events:none; color:blue; border-color:blue;"> Compra</a>
+                {% else %}
                 <a href="./purchase" class="button xs-eleven xs-offset-by-four sm-three md-two md-offset-by-three lg-two lg-offset-by-four four columns menu-button boton-menu fa fa-money"> Compra</a>
+                {% endif %}
+
+                {% if request.path == '/status' %}
+                <a href="./status" class="button xs-eleven xs-offset-by-four sm-three md-two md-offset-by-three lg-two lg-offset-by-four four columns menu-button boton-menu fa fa-money" style="pointer-events:none;  color:blue; border-color:blue;"> Estat</a>
+                {% else %}
                 <a href="./status" class="button xs-eleven sm-three md-two lg-two four columns menu-button boton-menu fa fa-calculator"> Estat</a>
+                {% endif %}
+
             </nav>
         </div>
         
