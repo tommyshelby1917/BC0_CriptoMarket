@@ -11,7 +11,7 @@ import json
 DBFILE = app.config['DBFILE']
 API_KEY = app.config['API_KEY']
 
-def consultaApi(fromMoneda, toMoneda, cantidad=1):
+def convertirApi(fromMoneda, toMoneda, cantidad=1):
 # Conexion con la API y parámetros
     url = f"https://pro-api.coinmarketcap.com/v1/tools/price-conversion?amount={cantidad}&symbol={fromMoneda}&convert={toMoneda}&CMC_PRO_API_KEY={API_KEY}"
     headers = {
@@ -28,15 +28,13 @@ def consultaApi(fromMoneda, toMoneda, cantidad=1):
         data = json.loads(response.text)
             
         valor_from = round(data['data']['amount'], 10)
-        valor_to = round(data['data']['quote'][toMoneda]['price'], 10)
-    
+        valor_to = round(data['data']['quote'][toMoneda]['price'], 10)    
         
     except (ConnectionError, Timeout, TooManyRedirects, KeyError) as errores:
         raise BufferError
+        print(errores)
 
     return valor_from, valor_to
-
-# print(consultaApi('EUR', 'BTC'))
 
 # Función de la query a la BD
 def consulta(query, params=()):
@@ -72,7 +70,10 @@ def calcularWallet():
     # 30.000€ iniciales para invertir
     wallet = {'EUR':30000, 'ETH':0, 'LTC':0,'BNB':0,'EOS':0,'XLM':0,'TRX':0,'BTC':0,'XRP':0,'BCH':0,'USDT':0,'BSV':0,'ADA':0}
 
-    lista_movimientos = consulta('SELECT * FROM movements;')
+    try:
+        lista_movimientos = consulta('SELECT * FROM movements;')
+    except:
+        raise MemoryError
 
     # Suma y resta calculando el valor de tu wallet
     for movimiento in lista_movimientos:
@@ -102,10 +103,13 @@ def index():
     lista_monedas = ['ETH','LTC','BNB','EOS','XLM','TRX','BTC','XRP','BCH','USDT','BSV','ADA']
     valor_todas = []
 
-    lista_movimientos = consulta('SELECT * FROM movements;')
+    try:
+        lista_movimientos = consulta('SELECT * FROM movements;')
+    except:
+        raise MemoryError
 
     for moneda in lista_monedas:
-        valor_todas.append(consultaApi(moneda, 'EUR'))
+        valor_todas.append(convertirApi(moneda, 'EUR'))
     
     dict_monedas = dict(zip(lista_monedas,valor_todas))
 
@@ -143,9 +147,9 @@ def purchase():
 
         if form.validate():
             
-            cantidad_obtenida = consultaApi(form.moneda_compra_from.data, form.moneda_compra_to.data, form.cantidad_compra.data)[1]
+            cantidad_obtenida = convertirApi(form.moneda_compra_from.data, form.moneda_compra_to.data, form.cantidad_compra.data)[1]
 
-            precio_unidad = consultaApi(form.moneda_compra_to.data, 'EUR', 1)[1]
+            precio_unidad = convertirApi(form.moneda_compra_to.data, 'EUR', 1)[1]
 
             if form.moneda_compra_from.data != form.moneda_compra_to.data:
 
@@ -173,7 +177,7 @@ def purchase():
                                         float(form.cantidad_compra.data),
                                         str(form.moneda_compra_to.data),
                                         float(cantidad_obtenida),
-                                        float(consultaApi(form.moneda_compra_from.data,'EUR',form.cantidad_compra.data)[1])
+                                        float(convertirApi(form.moneda_compra_from.data,'EUR',form.cantidad_compra.data)[1])
                                     )
                             )
 
@@ -182,7 +186,7 @@ def purchase():
                             redirect(url_for("index"))
                         
                         except:
-                            raise BufferError
+                            raise MemoryError
 
 
                     return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data, wallet=monedas_con_credito)
@@ -198,20 +202,24 @@ def purchase():
 
 @app.route('/status')
 def status():
-    
-    lista_movimientos = consulta('SELECT * FROM movements;')
+    try:
+        lista_movimientos = consulta('SELECT * FROM movements;')
+    except:
+        raise MemoryError
 
     valores_actuales = []
     for movimiento in lista_movimientos:
-        valores_actuales.append(consultaApi(movimiento['to_moneda'],'EUR',movimiento['to_cantidad'])[1])
+        valores_actuales.append(convertirApi(movimiento['to_moneda'],'EUR',movimiento['to_cantidad'])[1])
 
     valores_antiguos = []
     for movimiento in lista_movimientos:
         valores_antiguos.append(movimiento['valor_en_euros'])
 
     total_balance = (round(sum(valores_actuales) - sum(valores_antiguos), 2))
-
-    inversion_total = consulta("SELECT SUM(from_cantidad) FROM movements where from_moneda='EUR';")[0]['SUM(from_cantidad)']
+    try:
+        inversion_total = consulta("SELECT SUM(from_cantidad) FROM movements where from_moneda='EUR';")[0]['SUM(from_cantidad)']
+    except:
+        raise MemoryError
 
     return render_template("status.html", lista_movimientos=lista_movimientos, valores_actuales=valores_actuales, valores_antiguos=valores_antiguos, total_balance=total_balance, inversion_total=inversion_total)
 
@@ -234,6 +242,11 @@ def internal_error(error):
 def type_error(error):
     print("Error interno!")
     return render_template('apierror.html'), 500
+
+@app.errorhandler(MemoryError)
+def memory_error(error):
+    print("Error de conexion con la base de datos!")
+    return render_template("dberror.html"), 500
 
 
 
