@@ -34,7 +34,10 @@
 
         <div class="three columns">
             <h2 class="titulo-seccion"> TOTLS.</h2>
-            <p> <b>Has invertit un total de:</b> {{ inversion_total }}€</p> 
+            <p> <b>Has invertit un total de:</b>
+            {% if inversion_total is not none %} {{ inversion_total }}€
+            {% else %} 0€</p>
+            {% endif %}
             <p> <b>Balanç total:</b> {{ total_balance }}€ </p> 
         </div>
     </div>

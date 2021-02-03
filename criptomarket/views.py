@@ -225,7 +225,6 @@ def status():
 
 @app.errorhandler(404)
 def page_not_found(e):
-    print("Error 404!")
     return render_template('404.html'), 404
 
 @app.errorhandler(BufferError)

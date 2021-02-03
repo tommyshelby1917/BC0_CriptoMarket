@@ -74,3 +74,8 @@
     margin-bottom: 55px;
     color: white;
 }
+
+.empty {
+    margin-top: 100px !important;
+    color: white !important
+}
