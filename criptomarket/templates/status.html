@@ -2,35 +2,61 @@
 {% block title %}Estat de les inversions{% endblock %}
 {% block body %}
 
+<div class="row moviments">
+
+    <div class="nine columns">
+        <h2 class="titulo-seccion">MVMNTS.</h2>
+        <table class="moviments">
+            {% if lista_movimientos |length > 0 %} 
+            <tr>
+                <th>Data</th>
+                <th>Hora</th>
+                <th>De</th>
+                <th>Quantitat</th>
+                <th>A</th>
+                <th>Quantitat</th>
+            </tr>
+            {% for movimiento in lista_movimientos %}
+                <tr>
+                    <td>{{ movimiento['date']}}</td>
+                    <td>{{ movimiento['time'] }}</td>
+                    <td>{{ movimiento['from_moneda'] }}</td>
+                    <td>{{ movimiento['from_cantidad'] }}</td>
+                    <td>{{ movimiento['to_moneda'] }}</td>
+                    <td>{{ movimiento['to_cantidad'] }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <p class="empty">No hi ha hagut moviments fins ara</p>
+            <p><a href="./purchase"> Fes una compra </a></p>
+        {% endif %}
+        </table>
+    </div>
+</div>
+
 <div class="container status">
     <div class="row">
         <div class="nine columns">
             <h2 class="titulo-seccion"> INVRSIONS.</h2>
-            <table>
+            <table class="wallet">
                 <tr>
-                    <th>Fecha</th>
-                    <th>Hora</th>
-                    <th>Vas comprar:</th>
-                    <th>Valor antic:</th>
-                    <th>Valor actual:</th>
-                    <th>Balanç</th>
+                    <th>Moneda</th>
+                    <th>Valor cripto</th>
+                    <th>Valor en euros</th>
                 </tr>
-            {% if lista_movimientos |length > 0 %} 
-                {% for movimiento in lista_movimientos %}
-                    <tr>
-                        <td>{{ movimiento['date']}}</td>
-                        <td>{{ movimiento['time'] }}</td>
-                        <td>{{ movimiento['to_cantidad']|round(3) }} {{ movimiento['to_moneda'] }}</td>
-                        <td>{{ valores_antiguos[loop.index0]|round(2) }} €</td>
-                        <td>{{ valores_actuales[loop.index0]|round(2) }} € </td>
-                        <td>{{ valores_actuales[loop.index0]|round(0) - valores_antiguos[loop.index0]|round(0) }} €</td>
-                    </tr>
+                {% for moneda, valor in criptowallet.items() %}
+                <tr>
+                    <td>{{ moneda }}</td>
+                    <td>{{ valor }}</td>
+                {% for movimiento in valor_euros %}
+                    <td>{{movimiento}}</td>
                 {% endfor %}
-            {% else %}
-                <p>No hi ha hagut moviments fins ara</p>
-            {% endif %}
+                {% endfor %}
+                </tr>
             </table>
         </div>
+
+    </div>
 
         <div class="three columns">
             <h2 class="titulo-seccion"> TOTLS.</h2>

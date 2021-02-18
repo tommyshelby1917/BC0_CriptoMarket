@@ -202,26 +202,36 @@ def purchase():
 
 @app.route('/status')
 def status():
+
     try:
         lista_movimientos = consulta('SELECT * FROM movements;')
     except:
         raise MemoryError
 
-    valores_actuales = []
-    for movimiento in lista_movimientos:
-        valores_actuales.append(convertirApi(movimiento['to_moneda'],'EUR',movimiento['to_cantidad'])[1])
+    # Wallet de criptomonedas sin los euros
+    wallet = calcularWallet()
+    del wallet['EUR']
+    criptowallet = {}
+    for valor in wallet:
+        if wallet[valor] > 0:
+            criptowallet[valor] = wallet[valor]
+    
+    # Una lista con los valores en euros de cada wallet que tienes
+    valor_euros = []
+    for cripto in criptowallet:
+        valor_euros.append(convertirApi(cripto,'EUR',criptowallet[cripto])[1])
 
-    valores_antiguos = []
-    for movimiento in lista_movimientos:
-        valores_antiguos.append(movimiento['valor_en_euros'])
+    # La suma en euros de todas las monedas que tienes
+    valor_euros_actual_criptos = sum(valor_euros)
+    print(valor_euros_actual_criptos)
+    
 
-    total_balance = (round(sum(valores_actuales) - sum(valores_antiguos), 2))
     try:
         inversion_total = consulta("SELECT SUM(from_cantidad) FROM movements where from_moneda='EUR';")[0]['SUM(from_cantidad)']
     except:
         raise MemoryError
 
-    return render_template("status.html", lista_movimientos=lista_movimientos, valores_actuales=valores_actuales, valores_antiguos=valores_antiguos, total_balance=total_balance, inversion_total=inversion_total)
+    return render_template("status.html", lista_movimientos=lista_movimientos, valor_euros=valor_euros, inversion_total=inversion_total, criptowallet=criptowallet, valor_euros_actual_criptos=valor_euros_actual_criptos)
 
 @app.errorhandler(404)
 def page_not_found(e):
