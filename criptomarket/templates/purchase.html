@@ -67,7 +67,11 @@
                     </tr>
                     <tr>
                         <th> {{ form.calcular_compra }} </th>
-                        <th> {{ form.confirmar_compra }} </th>
+                        {% if comprar == True %}
+                            <th> {{ form.confirmar_compra }} </th>
+                        {% else %}
+                            <th style="display:none"> {{ form.confirmar_compra }} </th>
+                        {% endif %}
                     </tr>
                 </table>
 

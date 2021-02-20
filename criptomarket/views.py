@@ -127,6 +127,7 @@ def purchase():
     cantidad_obtenida = 0
     precio_unidad = 0
     calculando = False
+    comprar = False
 
     # El teu wallet
     monedas_con_credito = {}
@@ -155,15 +156,23 @@ def purchase():
 
                 if form.calcular_compra.data:
 
-                    calculando = True
+                    if form.cantidad_compra.data > wallet[form.moneda_compra_from.data]:
 
-                    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data, calculando=calculando, wallet=monedas_con_credito)
+                        flash("Pots consultar el canvi de moneda, però no tens suficientment crèdit per fer la compra.")
+                        return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data, wallet=monedas_con_credito, comprar=comprar)
+
+                    else:
+
+                        calculando = True
+                        comprar = True
+
+                        return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data, calculando=calculando, wallet=monedas_con_credito, comprar=comprar)
                 
                 elif form.confirmar_compra.data:
                     
                     if form.cantidad_compra.data > wallet[form.moneda_compra_from.data]:
                         flash("No tens suficienment crèdit. No s'ha registrat la compra.")
-                        return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data, wallet=monedas_con_credito)
+                        return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data, wallet=monedas_con_credito, comprar=comprar)
                     
                     else:
 
@@ -189,16 +198,16 @@ def purchase():
                             raise MemoryError
 
 
-                    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data, wallet=monedas_con_credito)
+                    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, moneda_to=form.moneda_compra_to.data, wallet=monedas_con_credito, comprar=comprar)
             else:
                 flash("La moneda de compra i venta no poden ser la mateixa.")
-                return render_template("purchase.html", form=form, cantidad_obtenida=0, precio_unidad=0, wallet=monedas_con_credito)
+                return render_template("purchase.html", form=form, cantidad_obtenida=0, precio_unidad=0, wallet=monedas_con_credito, comprar=comprar)
 
         
         else:
-            return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, wallet=monedas_con_credito)
+            return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, wallet=monedas_con_credito, comprar=comprar)
             
-    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, wallet=monedas_con_credito)
+    return render_template("purchase.html", form=form, cantidad_obtenida=cantidad_obtenida, precio_unidad=precio_unidad, wallet=monedas_con_credito, comprar=comprar)
 
 @app.route('/status')
 def status():
@@ -216,22 +225,36 @@ def status():
         if wallet[valor] > 0:
             criptowallet[valor] = wallet[valor]
     
+    
     # Una lista con los valores en euros de cada wallet que tienes
     valor_euros = []
     for cripto in criptowallet:
         valor_euros.append(convertirApi(cripto,'EUR',criptowallet[cripto])[1])
 
     # La suma en euros de todas las monedas que tienes
-    valor_euros_actual_criptos = sum(valor_euros)
-    print(valor_euros_actual_criptos)
+    total_cripto_valores = sum(valor_euros)
+
+    # Euros atrapados en inversion
+    euros_atrapados = 0
+    de_euros = 0
+    a_euros = 0
     
+    if consulta("SELECT SUM(from_cantidad) FROM movements where from_moneda='EUR';")[0]['SUM(from_cantidad)'] == None:
+        de_euros = 0
+    else:
+        de_euros = consulta("SELECT SUM(from_cantidad) FROM movements where from_moneda='EUR';")[0]['SUM(from_cantidad)']
+    
+    if consulta("SELECT SUM(to_cantidad) FROM movements where to_moneda='EUR';")[0]['SUM(to_cantidad)'] == None:
+        a_euros = 0
+    else:
+        a_euros = consulta("SELECT SUM(to_cantidad) FROM movements where to_moneda='EUR';")[0]['SUM(to_cantidad)']
 
-    try:
-        inversion_total = consulta("SELECT SUM(from_cantidad) FROM movements where from_moneda='EUR';")[0]['SUM(from_cantidad)']
-    except:
-        raise MemoryError
+    euros_atrapados = euros_atrapados - de_euros + a_euros
 
-    return render_template("status.html", lista_movimientos=lista_movimientos, valor_euros=valor_euros, inversion_total=inversion_total, criptowallet=criptowallet, valor_euros_actual_criptos=valor_euros_actual_criptos)
+    # Estado actual de la inversión
+    estado_inversion = total_cripto_valores - abs(euros_atrapados)  
+    
+    return render_template("status.html", lista_movimientos=lista_movimientos, valor_euros=valor_euros, criptowallet=criptowallet, total_cripto_valores=total_cripto_valores, euros_atrapados=euros_atrapados, estado_inversion=estado_inversion)
 
 @app.errorhandler(404)
 def page_not_found(e):

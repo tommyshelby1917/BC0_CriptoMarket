@@ -1,15 +1,27 @@
 .status {
-    display: flex;
+    display: block;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    align-items: left;
+    justify-content: left;
     padding: 50px;
     color: white;
     background-color: #0f62ff;
     background-image: url("https://www.transparenttextures.com/patterns/black-linen-2.png");
 }
 
-.status:hover {
-    background-color: #002975;
+.totales_tabla {
+    display: flex;
+    justify-content: left;
+    align-items: left;
+    background-color: #0f62ff;
     background-image: url("https://www.transparenttextures.com/patterns/black-linen-2.png");
+    color: #fff;
+}
+
+.columna-inversiones {
+    margin-left: 50px !important;
+}
+
+.moved_table {
+    border: 0px 0px 0px 1px solid white !important;
 }
